@@ -1,5 +1,8 @@
 const { Provider } = require('../structures')
 
+const fs = require('fs/promises')
+const path = require('path')
+
 module.exports = class NitroProvider extends Provider {
   constructor(name, config) {
     super(name, config)
@@ -8,11 +11,11 @@ module.exports = class NitroProvider extends Provider {
   }
 
   async handle() {
-    await super.handle()
     const sources = new Array()
 
     for (const { name, ...options } of this.libraries) {
-      const result = await this.fetchFile(options.map)
+      const [text, result] = await this.fetchFile(options.map)
+      fs.writeFile(path.join(this.output, options.map.split(/\//g).pop()), Buffer.from(text))
 
       sources.push({
         name, ...options, keys: Object.values(result)[0].map(({ lib, id }) => lib || id)

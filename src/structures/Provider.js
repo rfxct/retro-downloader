@@ -73,15 +73,15 @@ module.exports = class Provider {
 
   async fetchJSON(url, options) {
     const response = await fetch(url, options)
-    const result = await response.json()
-    return result
+    const text = await response.text()
+    const json = JSON.parse(text)
+    return [text, json]
   }
 
   async fetchXML(url, options) {
     const response = await fetch(url, options)
-    const result = await response.text().then(xml => parser.parse(xml, {
-      ignoreAttributes: false
-    }))
-    return result
+    const text = await response.text()
+    const xml = parser.parse(text, { ignoreAttributes: false })
+    return [text, xml]
   }
 }
