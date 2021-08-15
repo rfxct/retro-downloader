@@ -12,10 +12,11 @@ module.exports = class NitroProvider extends Provider {
     const sources = new Array()
 
     for (const { name, ...options } of this.libraries) {
-      const result = await this.fetchFile(options.data)
+      const result = await this.fetchFile(options.map)
 
       sources.push({
-        name, ...options, keys: Object.values(result)[0].map(({ lib, id }) => lib || id)
+        name, ...options, keys: Object.values(result.map)[0].map(
+          ({ '@_id': id, '@_lib': lib }) => lib || id)
       })
     }
 
