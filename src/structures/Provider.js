@@ -14,6 +14,7 @@ module.exports = class Provider {
   constructor(name, config) {
     this.config = config
     this.name = chalk.yellow(name.toUpperCase())
+    this.ext = name
 
     this.output = config.outputDir ?? `./output/${this.name}`
     this.threads = config.threads ?? 1
@@ -37,7 +38,7 @@ module.exports = class Provider {
       await fs.promises.mkdir(output, { recursive: true })
 
       keys.forEach(async asset => {
-        queue.push({ asset, folder, output })
+        queue.push({ asset, folder, output, ext: this.ext })
           .then(() => spinner.text = `${queue.length()} ${name}s left`)
           .catch(err => {
             spinner.fail(chalk.red(`Error downloading asset ${asset}`))
@@ -47,14 +48,14 @@ module.exports = class Provider {
     }
   }
 
-  async worker({ asset, folder, output }) {
+  async worker({ asset, folder, ext, output }) {
     const url = folder?.replace(/%asset%/g, asset)
 
     return new Promise((resolve, reject) => {
       request(url)
         .on('complete', resolve)
         .on('error', reject)
-        .pipe(fs.createWriteStream(path.join(output, asset)))
+        .pipe(fs.createWriteStream(path.join(output, `${asset}.${ext}`)))
     })
   }
 
