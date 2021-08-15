@@ -2,5 +2,12 @@
   "name": "retro-downloader",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "fast-xml-parser": "^3.19.0",
+    "fastq": "^1.11.1",
+    "node-fetch": "^2.6.1",
+    "request": "^2.88.2"
+  }
 }
