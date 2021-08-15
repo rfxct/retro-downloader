@@ -15,7 +15,7 @@ module.exports = class NitroProvider extends Provider {
 
     for (const { name, ...options } of this.libraries) {
       const [text, result] = await this.fetchFile(options.map)
-      await fse.outputFile(path.join(this.output, options.map.split(/\//g).pop()), Buffer.from(text))
+      await fse.outputFile(path.join(this.output, options.map.split('/').pop()), Buffer.from(text))
 
       sources.push({
         name, ...options, keys: Object.values(result)[0].map(({ lib, id }) => lib || id)

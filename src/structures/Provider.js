@@ -14,7 +14,6 @@ module.exports = class Provider {
   constructor(name, config) {
     this.config = config
     this.name = chalk.yellow(name.toUpperCase())
-    this.ext = name
 
     this.output = config.outputDir ?? `./output/${this.name}`
     this.threads = config.threads ?? 1
@@ -55,7 +54,7 @@ module.exports = class Provider {
       request(url)
         .on('complete', resolve)
         .on('error', reject)
-        .pipe(fs.createWriteStream(path.join(output, `${asset}.${ext}`)))
+        .pipe(fs.createWriteStream(path.join(output, url.split('/').pop())))
     })
   }
 
