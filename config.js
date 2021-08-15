@@ -3,7 +3,7 @@ module.exports = {
   nitro: {
     outputDir: './output/nitro',
     enabled: true,
-    threads: 5,
+    threads: 50,
     libraries: [
       {
         name: 'figure',
@@ -21,7 +21,7 @@ module.exports = {
   },
   flash: {
     outputDir: './output/flash',
-    enabled: false,
+    enabled: true,
     threads: 5,
     libraries: [
       {

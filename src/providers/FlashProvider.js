@@ -1,6 +1,6 @@
 const { Provider } = require('../structures')
 
-const fs = require('fs/promises')
+const fse = require('fs-extra')
 const path = require('path')
 
 module.exports = class NitroProvider extends Provider {
@@ -15,7 +15,7 @@ module.exports = class NitroProvider extends Provider {
 
     for (const { name, ...options } of this.libraries) {
       const [text, result] = await this.fetchFile(options.map)
-      fs.writeFile(path.join(this.output, options.map.split(/\//g).pop()), Buffer.from(text))
+      await fse.outputFile(path.join(this.output, options.map.split(/\//g).pop()), Buffer.from(text))
 
       sources.push({
         name, ...options, keys: Object.values(result.map)[0].map(
