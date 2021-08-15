@@ -76,7 +76,9 @@ module.exports = class Provider {
 
   async fetchXML(url, options) {
     const response = await fetch(url, options)
-    const result = await response.text().then(parser.parse)
+    const result = await response.text().then(xml => parser.parse(xml, {
+      ignoreAttributes: false
+    }))
     return result
   }
 }
