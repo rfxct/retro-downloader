@@ -1,6 +1,9 @@
 const config = require('./config')
 
-const NitroProvider = require('./src/providers/NitroProvider')
+const Providers = require('./src/providers')
+const sources = Object.entries(config).filter(([, o]) => o.enabled)
 
-const provider = new NitroProvider('nitro', config.nitro)
-provider.exec()
+for (const [name, config] of sources) {
+  const Provider = new Providers[name](name, config)
+  Provider.exec()
+}
