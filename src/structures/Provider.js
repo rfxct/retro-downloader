@@ -1,45 +1,82 @@
+const fastq = require('fastq')
+
+const request = require('request')
 const fetch = require('node-fetch')
 const parser = require('fast-xml-parser')
-const request = require('request')
+
 const fs = require('fs')
+const path = require('path')
+
+const ora = require('ora')
+const chalk = require('chalk')
 
 module.exports = class Provider {
-    constructor(config) {
-        this.config = config
+  constructor(name, config) {
+    this.config = config
+    this.name = chalk.yellow(name.toUpperCase())
 
-        this.output = config.output || './output/nitro'
-        this.threads = config.threads || 1
+    this.output = config.outputDir ?? `./output/${this.name}`
+    this.threads = config.threads ?? 1
+  }
+
+  async handle() { }
+
+  async exec() {
+    const libraries = await this.handle()
+
+    for (const { name, folder, keys } of libraries) {
+      const spinner = ora({ prefixText: `[${this.name}]` }).start()
+
+      const queue = fastq.promise(this.worker, this.threads)
+      queue.empty = () => spinner.succeed(`All ${name}s have been downloaded`)
+
+      const output = path.join(this.output, name)
+      await fs.promises.mkdir(output, { recursive: true })
+
+      keys.forEach(async asset => {
+        queue.push({ asset, folder, output })
+          .then(() => spinner.text = `${queue.length()} ${name}s left`)
+          .catch(err => {
+            spinner.fail(chalk.red(`Error downloading asset ${asset}`))
+            console.error(err)
+          })
+      })
     }
+  }
 
-    async handle() { }
+  async worker({ asset, folder, output }) {
+    const url = folder?.replace(/%asset%/g, asset)
 
+    return new Promise((resolve, reject) => {
+      request(url)
+        .on('complete', resolve)
+        .on('error', reject)
+        .pipe(fs.createWriteStream(path.join(output, asset)))
+    })
+  }
 
-    async worker({ assetId, baseURL, output }) {
-        const downloadURL = baseURL.replace(/%asset%/g, assetId)
+  // HTTP
+  async fetchFile(url, options) {
+    const source = url.split(/\./g).pop().toUpperCase()
+    const result = await this['fetch' + source](url, options)
+    return result
+  }
 
-        return new Promise((resolve, reject) => {
-            request(downloadURL)
-                .on('complete', () => resolve(assetId))
-                .on('error', err => reject(err))
-                .pipe(fs.createWriteStream(`${output}/${assetId}`))
-        })
-    }
+  async fetchTXT(url, options) {
+    const response = await fetch(url, options)
+    const result = await response.text()
+    return result
+  }
 
-    async #fetch(url, options = {}) {
-        const result = await fetch(url, options)
-        return result
-    }
+  async fetchJSON(url, options) {
+    const response = await fetch(url, options)
+    const result = await response.json()
+    return result
+  }
 
-    async fetchJson(url, options) {
-        const response = await this.#fetch(url, options)
-        const result = await response.json()
-        return result
-    }
-
-    async fetchXML(url, options) {
-        const response = await this.#fetch(url, options)
-        const raw = await response.text()
-        const result = await parser.parse(raw)
-        return result
-    }
+  async fetchXML(url, options) {
+    const response = await fetch(url, options)
+    const result = await response.text().then(parser.parse)
+    return result
+  }
 }

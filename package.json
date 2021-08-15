@@ -8,6 +8,7 @@
     "fast-xml-parser": "^3.19.0",
     "fastq": "^1.11.1",
     "node-fetch": "^2.6.1",
+    "ora": "^5.4.1",
     "request": "^2.88.2"
   }
 }

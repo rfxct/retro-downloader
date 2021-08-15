@@ -1,3 +1,3 @@
 module.exports = {
-    Provider: require('./Provider')
+  Provider: require('./Provider')
 }

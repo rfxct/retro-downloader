@@ -1,4 +1,4 @@
 module.exports = {
-    nitro: require('./NitroProvider'),
-    flash: require('./FlashProvider')
+  nitro: require('./NitroProvider'),
+  flash: require('./FlashProvider')
 }
