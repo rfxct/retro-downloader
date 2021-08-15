@@ -1,5 +1,7 @@
 const fetch = require('node-fetch')
 const parser = require('fast-xml-parser')
+const request = require('request')
+const fs = require('fs')
 
 module.exports = class Provider {
     constructor(config) {
@@ -11,7 +13,17 @@ module.exports = class Provider {
 
     async handle() { }
 
-    async worker() { }
+
+    async worker({ assetId, baseURL, output }) {
+        const downloadURL = baseURL.replace(/%asset%/g, assetId)
+
+        return new Promise((resolve, reject) => {
+            request(downloadURL)
+                .on('complete', () => resolve(assetId))
+                .on('error', err => reject(err))
+                .pipe(fs.createWriteStream(`${output}/${assetId}`))
+        })
+    }
 
     async #fetch(url, options = {}) {
         const result = await fetch(url, options)

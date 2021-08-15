@@ -1,4 +1,3 @@
-const request = require('request')
 const fastq = require('fastq')
 const chalk = require('chalk')
 const fs = require('fs')
@@ -22,17 +21,6 @@ module.exports = class NitroProvider extends Provider {
             figure: { ...this.figure, data: figureData.libraries.map(({ id }) => id) },
             effect: { ...this.effect, data: effectData.effects.map(({ lib }) => lib) },
         }
-    }
-
-    async worker({ assetId, baseURL, output }) {
-        const downloadURL = baseURL.replace(/%asset%/g, assetId)
-
-        return new Promise((resolve, reject) => {
-            request(downloadURL)
-                .on('complete', () => resolve(assetId))
-                .on('error', err => reject(err))
-                .pipe(fs.createWriteStream(`${output}/${assetId}`))
-        })
     }
 
     async exec() {
