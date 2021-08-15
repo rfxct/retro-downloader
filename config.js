@@ -21,7 +21,7 @@ module.exports = {
   },
   flash: {
     outputDir: './output/flash',
-    enabled: true,
+    enabled: false,
     threads: 5,
     libraries: [
       {

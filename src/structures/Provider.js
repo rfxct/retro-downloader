@@ -26,9 +26,12 @@ module.exports = class Provider {
 
     for (const { name, folder, keys } of libraries) {
       const spinner = ora({ prefixText: `[${this.name}]` }).start()
+      const startedAt = Date.now()
 
       const queue = fastq.promise(this.worker, this.threads)
-      queue.empty = () => spinner.succeed(`All ${name}s have been downloaded`)
+      queue.empty = () => spinner.succeed(
+        `All ${name}s have been downloaded. Done in ${~~((Date.now() - startedAt)/1000)} seconds`
+        )
 
       const output = path.join(this.output, name)
       await fs.promises.mkdir(output, { recursive: true })
